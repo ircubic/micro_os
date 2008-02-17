@@ -2,7 +2,6 @@
 #define KERNEL_ASM_H 1
 
 /* Small ASM stubs to enable the use of I/O ports in C */
-
 static inline void outb(unsigned short port, unsigned char val)
 {
 	asm volatile("outb %0, %1"::"a"(val), "Nd"(port));

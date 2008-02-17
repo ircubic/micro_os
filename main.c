@@ -2,10 +2,13 @@
 #include "screen.h"
 #include "init.h"
 #include "pic.h"
-extern void setup_idt();
-extern void fsck();
-extern const char* idt;
 
+/* Methods from interrupt.s */
+extern void setup_idt();
+
+/* Our generic Exception handler, that is bounced to from
+ * any of the 32 first interrupt handlers in the IDT
+ */
 void k_exception_handler(unsigned int exception)
 {
 	set_cursor(0,0);
@@ -16,6 +19,7 @@ void k_exception_handler(unsigned int exception)
 	print_hex_char(exception);
 }
 
+/* Default keymap, just maps some symbols and digits */
 const char keymap[128] = {
 	  0,  -1, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',  -1,  -1,
 	'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\n', -1, 'A', 'S',
@@ -27,6 +31,9 @@ const char keymap[128] = {
 	 -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
 };
 
+/* Keyboard "driver", basically just an IRQ1 interrupt handler
+ * Decodes the make/break codes via the keymap and prints the letters
+ */
 void keyboard_handler()
 {
 	unsigned char code = inb(0x60);
@@ -37,13 +44,16 @@ void keyboard_handler()
 	putch(' ');
 	if((code & 0x80) == 0)
 	{
+		// If there is a map, print the letter
 		if(keymap[code] != -1)
 			putch(keymap[code]);
+		// Otherwise print the hex code
 		else
 			print_hex_char(code);
 	}
 }
 
+/* Generic IRQ handler, is bounced to from interrupt handlers 32-47 */
 void k_irq_handler(unsigned int irq)
 {
 	if(irq == 1)
@@ -61,6 +71,8 @@ void k_irq_handler(unsigned int irq)
 	}
 	pic_signal_eoi(irq);
 }
+
+/* Kernel main */
 void _main(void *mb_data, unsigned int mb_magic)
 {
 	cls();

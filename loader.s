@@ -15,6 +15,7 @@ CHECKSUM equ -(MAGIC + FLAGS) ; Checksum for Multiboot
 
 STACKSIZE equ 0x4000
 
+; Set up a stack and bounce into kernel main
 _loader:
 	mov esp, stack+STACKSIZE
 	push eax ; Multiboot magic number
@@ -24,6 +25,8 @@ _hlt_loop:
 	hlt
 	jmp _hlt_loop
 
+; Helper stub for setting the gdt and segments
+; XXX: Should probably move elsewhere
 gdt_set:
 extern gp
 	lgdt [gp]
@@ -32,11 +35,7 @@ extern gp
 	mov ss, eax
 	ret
 
-global fsck
-fsck:
-	int 3
-	ret
-
+; Space for our stack
 section .bss
 align 32
 stack:

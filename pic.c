@@ -1,10 +1,12 @@
 #include "pic.h"
 #include "asm.h"
 
+/* Remap the two PICs to new interrupt offsets */
 void pic_remap(unsigned int int_off1, unsigned int int_off2)
 {
 	unsigned char mask1, mask2;
 	asm("cli");
+	/* Save masks */
 	mask1 = inb(PIC_MASTER_DATA);
 	mask2 = inb(PIC_SLAVE_DATA);
 
@@ -32,9 +34,10 @@ void pic_remap(unsigned int int_off1, unsigned int int_off2)
 	asm("sti");
 }
 
+/* Signal EOI to PIC for IRQ */
 void pic_signal_eoi(unsigned int irq)
 {
-	/* Signal EOI for IRQ */
+	// IRQs from slave requires EOI to that too
 	if(irq >= 8)
 		outb(PIC_SLAVE_COMMAND, PIC_EOI);
 	outb(PIC_MASTER_COMMAND, PIC_EOI);

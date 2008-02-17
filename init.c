@@ -1,4 +1,13 @@
 #include "init.h"
+
+/* Code to initialize machine
+ * So far it's only used to set up segments in the GDT, but later
+ * a lot of the init code will be here
+ *
+ * The segments we set up are 4GB flat
+ */
+
+// A single GDT entry
 struct gdt_entry
 {
 	unsigned short limit_low;
@@ -9,17 +18,28 @@ struct gdt_entry
 	unsigned char base_high;
 } __attribute__((packed));
 
+// The GDTR data
 struct gdt_ptr
 {
 	unsigned short limit;
 	unsigned int base;
 } __attribute__((packed));
 
+// We use three segments
 struct gdt_entry gdt[3];
 struct gdt_ptr gp;
 
-void gdt_set();
+// This is in loader.s
+extern void gdt_set();
 
+/* Set a single entry in the GDT, we hate the format :/
+ * Params:
+ *  num    - The entry to set
+ *  base   - The address the segment starts with
+ *  limit  - The size of the segment
+ *  access - Access bits
+ *  gran   - Granularity of segment (set in upper nibble)
+ */
 void gdt_set_entry(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran)
 {
 	gdt[num].base_low = (base & 0xFFFF);
@@ -33,6 +53,7 @@ void gdt_set_entry(int num, unsigned long base, unsigned long limit, unsigned ch
 	gdt[num].access = access;
 }
 
+/* Set up and install our three segments */
 void gdt_install()
 {
 	gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
@@ -43,9 +64,4 @@ void gdt_install()
 	gdt_set_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
 
 	gdt_set();
-}
-
-void idt_install()
-{
-
 }

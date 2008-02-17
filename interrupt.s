@@ -2,6 +2,9 @@ global setup_idt
 extern k_exception_handler
 extern k_irq_handler
 
+; This code sets up our standard IDT for launching into
+; the kernel.
+
 section .text
 align 4
 
@@ -66,11 +69,13 @@ setup_idt:
 	sti
 	ret
 
+; Make room for our IDT
 align 4
 idt:
  TIMES ((32 + 16) * 8) db 0
 idt_end:
 
+; IDTR data
 idtr:
  dw 0
  dd 0

@@ -1,4 +1,11 @@
 #include "screen.h"
+/* Simple screen "driver" that utilizes standard VGA text mode to output text
+ * 
+ * Assumes an 80x25 screen, and character wraps.
+ * Has simple support for cursor position and stuff
+ */
+
+
 #define WIDTH 80
 #define HEIGHT 25
 static unsigned short *screen = (unsigned short*)0xB8000;
@@ -7,6 +14,7 @@ static int cursor_y = 0;
 static int cursor_idx = 0;
 static char color = 7;
 
+/* Set the cursor to a new place */
 void inline set_cursor(int x, int y)
 {
 	cursor_x = x;
@@ -14,6 +22,7 @@ void inline set_cursor(int x, int y)
 	cursor_idx = (y * WIDTH) + x;
 }
 
+/* Clear screen and reset cursor */
 void cls()
 {
 	int i = 0;
@@ -24,6 +33,7 @@ void cls()
 	cursor_idx = 0;
 }
 
+/* Put a single character in the current color to the current screen position */
 void inline putch(char chr)
 {
 	screen[cursor_idx] = chr | color << 8;
@@ -35,6 +45,7 @@ void inline putch(char chr)
 	}
 }
 
+/* Put a full string and go to next line */
 void puts(const char *string)
 {
 	while(*string)
@@ -45,6 +56,7 @@ void puts(const char *string)
 	set_cursor(0, cursor_y+1);
 }
 
+/* Helper method to get the hex equivalent of a 4bit number */
 char get_hex(char num)
 {
 	if(num >= 0 && num <= 9)
@@ -55,12 +67,14 @@ char get_hex(char num)
 		return 'a' + (num-10);
 }
 
+/* Print a char as hex (with no prefix) */
 void print_hex_char(char c)
 {
 	putch(get_hex((c>>4)&0xF));
 	putch(get_hex(c&0xF));
 }
 
+/* Print a 32 bit number as hex (with 0x prefix) */
 void print_hex(unsigned int num)
 {
 	putch('0');
