@@ -17,11 +17,12 @@ STACKSIZE equ 0x4000
 
 _loader:
 	mov esp, stack+STACKSIZE
-	;cli ; XXX: No interrupts = no triple fault = <3
 	push eax ; Multiboot magic number
 	push ebx ; Multiboot info struct
 	call _main
+_hlt_loop:
 	hlt
+	jmp _hlt_loop
 
 gdt_set:
 extern gp
