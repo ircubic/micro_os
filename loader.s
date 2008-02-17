@@ -1,4 +1,5 @@
 global _loader
+global gdt_set
 extern _main
 
 section .text
@@ -21,6 +22,20 @@ _loader:
 	push ebx ; Multiboot info struct
 	call _main
 	hlt
+	jmp $
+
+gdt_set:
+extern gp
+	lgdt [gp]
+	mov eax, 0x10
+	mov ds, eax
+	mov ss, eax
+	ret
+
+global fsck
+fsck:
+	int 3
+	ret
 
 section .bss
 align 32

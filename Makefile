@@ -12,8 +12,8 @@ ASMFLAGS = -f elf
 LDFLAGS = 
 
 # Object list for kernel
-ASM_OBJS = loader.o
-C_OBJS = main.o
+ASM_OBJS = loader.o interrupt.o
+C_OBJS = main.o init.o screen.o
 OBJS = $(ASM_OBJS) $(C_OBJS)
 
 # Other misc. vars
