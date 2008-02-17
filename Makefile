@@ -13,7 +13,7 @@ LDFLAGS =
 
 # Object list for kernel
 ASM_OBJS = loader.o interrupt.o
-C_OBJS = main.o init.o screen.o
+C_OBJS = main.o init.o screen.o pic.o
 OBJS = $(ASM_OBJS) $(C_OBJS)
 
 # Other misc. vars

@@ -52,12 +52,12 @@ char get_hex(char num)
 	else if(num >= 10 && num <= 16)
 		return 'A' + (num-10);
 	else
-		return '?';
+		return 'a' + (num-10);
 }
 
 void print_hex_char(char c)
 {
-	putch(get_hex(c>>4));
+	putch(get_hex((c>>4)&0xF));
 	putch(get_hex(c&0xF));
 }
 
