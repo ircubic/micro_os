@@ -21,9 +21,7 @@ _loader:
 	push eax ; Multiboot magic number
 	push ebx ; Multiboot info struct
 	call _main
-_hlt_loop:
-	hlt
-	jmp _hlt_loop
+	jmp $
 
 ; Helper stub for setting the gdt and segments
 ; XXX: Should probably move elsewhere

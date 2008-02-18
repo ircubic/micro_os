@@ -36,20 +36,18 @@ const char keymap[128] = {
  */
 void keyboard_handler()
 {
+	static char color = 0;
 	unsigned char code = inb(0x60);
-	set_cursor(0,0);
-	putch('K');
-	putch('B');
-	putch('D');
-	putch(' ');
 	if((code & 0x80) == 0)
 	{
+		set_color(color);
+		color = (color+1)%0xF;
 		// If there is a map, print the letter
 		if(keymap[code] != -1)
 			putch(keymap[code]);
 		// Otherwise print the hex code
-		else
-			print_hex_char(code);
+		//else
+			//print_hex_char(code);
 	}
 }
 
@@ -77,9 +75,17 @@ void _main(void *mb_data, unsigned int mb_magic)
 {
 	cls();
 	gdt_install();
+	set_color(2);
 	puts("GDT");
 	setup_idt();
+	set_color(3);
 	puts("IDT");
 	pic_remap(32, 32+8);
+	set_color(4);
 	puts("PIC");
+	set_color(7);
+	while(1)
+	{
+		hlt();
+	}
 }

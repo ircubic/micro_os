@@ -37,4 +37,10 @@ static inline unsigned long inl(unsigned short port)
 	asm volatile("inl %1, %0":"=a"(ret):"Nd"(port));
 	return ret;
 }
+
+/* Access to the HLT instruction for sleepin' */
+static inline void hlt()
+{
+	asm("hlt");
+}
 #endif

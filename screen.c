@@ -17,6 +17,15 @@ static char color = 7;
 /* Set the cursor to a new place */
 void inline set_cursor(int x, int y)
 {
+	while(x >= WIDTH)
+	{
+		x -= WIDTH;
+		y++;
+	}
+	while(y >= HEIGHT)
+	{
+		y -= HEIGHT;
+	}
 	cursor_x = x;
 	cursor_y = y;
 	cursor_idx = (y * WIDTH) + x;
@@ -36,13 +45,19 @@ void cls()
 /* Put a single character in the current color to the current screen position */
 void inline putch(char chr)
 {
-	screen[cursor_idx] = chr | color << 8;
-	cursor_idx++;
-	cursor_x++;
-	if(cursor_x == WIDTH)
+	if(chr == '\n')
 	{
 		set_cursor(0, cursor_y+1);
+		return;
 	}
+	screen[cursor_idx] = chr | color << 8;
+	set_cursor(cursor_x+1, cursor_y);
+	//cursor_idx++;
+	//cursor_x++;
+	//if(cursor_x == WIDTH)
+	//{
+		//set_cursor(0, cursor_y+1);
+	//}
 }
 
 /* Put a full string and go to next line */
@@ -85,4 +100,10 @@ void print_hex(unsigned int num)
 	{
 		print_hex_char(ptr[3-i]);
 	}
+}
+
+/* Set the color of the letters */
+void set_color(char c)
+{
+	color = c;
 }
