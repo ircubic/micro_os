@@ -5,6 +5,6 @@ void cls();
 void inline putch(char chr);
 void puts(const char *string);
 void print_hex_char(char c);
-void print_hex(unsigned int num);
+void print_hex(unsigned long num);
 void set_color(char c);
 #endif

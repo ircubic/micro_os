@@ -90,7 +90,7 @@ void print_hex_char(char c)
 }
 
 /* Print a 32 bit number as hex (with 0x prefix) */
-void print_hex(unsigned int num)
+void print_hex(unsigned long num)
 {
 	putch('0');
 	putch('x');

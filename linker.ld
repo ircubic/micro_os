@@ -3,6 +3,7 @@ ENTRY (_loader)
 SECTIONS{
     . = 0x00100000;
 
+	_start = .;
     .text :{
         *(.text)
         *(.rodata)
@@ -18,4 +19,5 @@ SECTIONS{
         *(.bss)
         _ebss = .;
     }
+	_end = .;
 }

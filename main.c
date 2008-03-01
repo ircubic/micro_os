@@ -2,8 +2,9 @@
 #include "screen.h"
 #include "init.h"
 #include "pic.h"
+#include "mem.h"
 
-/* Methods from interrupt.s */
+/* Method from interrupt.s */
 extern void setup_idt();
 
 /* Our generic Exception handler, that is bounced to from
@@ -36,18 +37,12 @@ const char keymap[128] = {
  */
 void keyboard_handler()
 {
-	static char color = 0;
 	unsigned char code = inb(0x60);
 	if((code & 0x80) == 0)
 	{
-		set_color(color);
-		color = (color+1)%0xF;
 		// If there is a map, print the letter
 		if(keymap[code] != -1)
 			putch(keymap[code]);
-		// Otherwise print the hex code
-		//else
-			//print_hex_char(code);
 	}
 }
 
@@ -70,20 +65,64 @@ void k_irq_handler(unsigned int irq)
 	pic_signal_eoi(irq);
 }
 
+// Physical memory size in pages
+extern void _end, _start;
+long phys_memory_size = 0;
+long kernel_size = 0;
+/* Initialize kernel, doing these steps:
+ *  - Set up GDT
+ *  - Set up IDT
+ *  - Remap PIC
+ *  - Set up pagestack
+ *  - Make a page directory that maps the kernel 1:1, as well as other things
+ *  - Set up paging
+ */
+void init(long *mb_data)
+{
+	cls();
+
+	/* Check if memory size is present in mb_data and save it for our own use */
+	if((mb_data[0] & 1) == 1)
+	{
+		phys_memory_size = (mb_data[2] + 1024) * 1024;
+	}
+	else
+	{
+		// XXX: Panic here
+	}
+
+	kernel_size = &_end - &_start;
+	set_color(1);
+	print_hex(phys_memory_size);
+	puts(" bytes of physical memory");
+	print_hex(kernel_size);
+	puts(" bytes used for kernel");
+
+	gdt_install();
+	set_color(2);
+	puts("Initialized GDT");
+
+	setup_idt();
+	set_color(3);
+	puts("Set up IDT");
+
+	pic_remap(32, 32+8);
+	set_color(4);
+	puts("Remapped PIC");
+
+	set_color(5);
+	init_pagestack(phys_memory_size, kernel_size);
+	set_color(6);
+	puts("Pagestack set up");
+
+	set_color(7);
+}
+
 /* Kernel main */
 void _main(void *mb_data, unsigned int mb_magic)
 {
-	cls();
-	gdt_install();
-	set_color(2);
-	puts("GDT");
-	setup_idt();
-	set_color(3);
-	puts("IDT");
-	pic_remap(32, 32+8);
-	set_color(4);
-	puts("PIC");
-	set_color(7);
+	init(mb_data);
+	/* Spin on the halt, doing nothing whatsoever except handle interrupts */
 	while(1)
 	{
 		hlt();
