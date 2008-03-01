@@ -7,7 +7,7 @@ LD = ld
 ASM = nasm
 
 # Flags
-CFLAGS = -O -Wall -Werror -fno-builtin -nostdlib -nostartfiles -nodefaultlibs
+CFLAGS = -Wall -Werror -fno-builtin -nostdlib -nostartfiles -nodefaultlibs
 ASMFLAGS = -f elf
 LDFLAGS = 
 
@@ -23,14 +23,14 @@ OUTPUT = kernel.bin
 default: $(OUTPUT)
 
 # Links the kernel binary
-$(OUTPUT): $(ASM_OBJS) $(C_OBJS)
+$(OUTPUT): $(LNKSCR) $(ASM_OBJS) $(C_OBJS)
 	$(LD) -T $(LNKSCR) -o kernel.bin $(OBJS)
 
-# Assembles .asm files into .o files =)
+# General statement for assembly files
 %.o: %.s
 	$(ASM) $(ASMFLAGS) -o $@ $<
 
-# Creates C files :o
+# General rule for C files
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 

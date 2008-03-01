@@ -69,11 +69,12 @@ void k_irq_handler(unsigned int irq)
 extern void _end, _start;
 long phys_memory_size = 0;
 long kernel_size = 0;
+
 /* Initialize kernel, doing these steps:
  *  - Set up GDT
  *  - Set up IDT
  *  - Remap PIC
- *  - Set up pagestack
+ *  - Set up physical allocator
  *  - Make a page directory that maps the kernel 1:1, as well as other things
  *  - Set up paging
  */
@@ -93,10 +94,10 @@ void init(long *mb_data)
 
 	kernel_size = &_end - &_start;
 	set_color(1);
-	print_hex(phys_memory_size);
+	/*print_hex(phys_memory_size);
 	puts(" bytes of physical memory");
 	print_hex(kernel_size);
-	puts(" bytes used for kernel");
+	puts(" bytes used for kernel");*/
 
 	gdt_install();
 	set_color(2);
@@ -111,7 +112,7 @@ void init(long *mb_data)
 	puts("Remapped PIC");
 
 	set_color(5);
-	init_pagestack(phys_memory_size, kernel_size);
+	init_palloc(phys_memory_size, kernel_size, mb_data);
 	set_color(6);
 	puts("Pagestack set up");
 
