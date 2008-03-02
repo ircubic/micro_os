@@ -1,0 +1,18 @@
+NOTES
+================================================================================
+
+Higher-Half
+===
+
+At bootup, the kernel is loaded into physical address 0x00100000, but virtual
+address 0xC0100000.  Thus it uses a trick when starting up that utilizes a
+"fake" GDT that makes this work until paging is set up. Any code BEFORE paging
+is set up needs to refer to physical memory with the proper offset.
+
+Memory map
+===
+
+The kernel lays itself out using this memory map:
+
+Kernel code resides from 0xC0100000 up to the nearest MB after its end.
+Page allocation bitmap and page directory also lies here.

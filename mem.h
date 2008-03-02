@@ -8,7 +8,7 @@
 void align_to_page(long *address);
 void *get_page();
 void free_page(void *address);
-void init_palloc(long phys_memory_size, long kernel_size, long *mb_data);
+unsigned long init_palloc(long phys_memory_size, long kernel_size, long *mb_data);
 
 typedef struct {
 	long size;

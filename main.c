@@ -70,7 +70,7 @@ void k_irq_handler(unsigned int irq)
 }
 
 // Physical memory size in pages
-extern void _end, _start;
+extern void _end, _start, _phys_start;
 long phys_memory_size = 0;
 long kernel_size = 0;
 
@@ -87,7 +87,6 @@ void init(long *mb_data)
 	/* Screen needs to work while we're in our trick segment */
 	screen_set_base((void*)DE_SEGMENT(0xB8000));
 	cls();
-	set_color(2);
 
 	/* Fix up MultiBoot data so that it can be used in our trick segmentation */
 	mb_data = (long*) DE_SEGMENT(mb_data);
@@ -105,24 +104,25 @@ void init(long *mb_data)
 
 
 	kernel_size = &_end - &_start;
-	print_hex(phys_memory_size);
-	puts(" bytes of physical memory");
-	print_hex(kernel_size);
-	puts(" bytes used for kernel");
 
-	set_color(3);
-	init_palloc(phys_memory_size, kernel_size, mb_data);
+	set_color(2);
+	kernel_size = init_palloc(phys_memory_size, kernel_size, mb_data);
 	puts("Pagestack set up");
 
-	set_color(4);
+	set_color(3);
 	setup_idt();
 	puts("Set up IDT");
 
-	set_color(5);
-	init_paging();
+	set_color(4);
+	init_paging(&_phys_start, kernel_size);
 	puts("Paging");
 
+	set_color(5);
 	gdt_install();
+	print_hex(kernel_page_dir[0]);
+	puts(" is the first MB!");
+	print_hex(page_base[256]);
+	puts(" is also the first MB");
 	screen_set_base((void*)0xB8000);
 	puts("Initialized GDT");
 

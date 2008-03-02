@@ -59,10 +59,8 @@ int get_page_in_cell(long cell)
 			/* Set page to reserved */
 			page_bitmap[cell] |= (1<<curr_bit);
 			// Keep track of which cell in the bitmap has the first free page
-			if(page_bitmap[cell] == ~0)
+			if(cell == earliest_free_cell && page_bitmap[cell] == ~0)
 				earliest_free_cell = cell + 1;
-			else
-				earliest_free_cell = cell;
 
 			return (cell<<CELL_BIT) + curr_bit;
 		}
@@ -265,7 +263,7 @@ void parse_memory_map(long *mb_data)
  * and reserve space for the memory areas given by GRUB as reserved, as well as
  * kernel space.
  */
-void init_palloc(long phys_memory_size, long kernel_size, long* mb_data)
+unsigned long init_palloc(long phys_memory_size, long kernel_size, long* mb_data)
 {
 	// Bitmap starts right after the end of the kernel code
 	page_bitmap = &_end;
@@ -314,5 +312,6 @@ void init_palloc(long phys_memory_size, long kernel_size, long* mb_data)
 			puts("");
 		}
 	}
+	return reserve;
 }
 
