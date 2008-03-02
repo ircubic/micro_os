@@ -22,7 +22,7 @@ struct gdt_entry
 struct gdt_ptr
 {
 	unsigned short limit;
-	unsigned int base;
+	unsigned long base;
 } __attribute__((packed));
 
 // We use three segments
@@ -57,7 +57,7 @@ void gdt_set_entry(int num, unsigned long base, unsigned long limit, unsigned ch
 void gdt_install()
 {
 	gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
-	gp.base = (unsigned int)&gdt;
+	gp.base = (unsigned long)&gdt;
 
 	gdt_set_entry(0, 0, 0, 0, 0);
 	gdt_set_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);

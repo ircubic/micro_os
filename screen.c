@@ -14,6 +14,11 @@ static int cursor_y = 0;
 static int cursor_idx = 0;
 static char color = 7;
 
+void screen_set_base(void *address)
+{
+	screen = (unsigned short*)address;
+}
+
 /* Set the cursor to a new place */
 void inline set_cursor(int x, int y)
 {

@@ -3,6 +3,10 @@
 #include "init.h"
 #include "pic.h"
 #include "mem.h"
+#include "paging.h"
+
+/* Macro for fixing up a memory address that is not segmented */
+#define DE_SEGMENT(x) ((void*)x - 0x40000000)
 
 /* Method from interrupt.s */
 extern void setup_idt();
@@ -80,7 +84,14 @@ long kernel_size = 0;
  */
 void init(long *mb_data)
 {
+	/* Screen needs to work while we're in our trick segment */
+	screen_set_base((void*)DE_SEGMENT(0xB8000));
 	cls();
+	set_color(2);
+
+	/* Fix up MultiBoot data so that it can be used in our trick segmentation */
+	mb_data = (long*) DE_SEGMENT(mb_data);
+	mb_data[12] = (long) DE_SEGMENT(mb_data[12]);
 
 	/* Check if memory size is present in mb_data and save it for our own use */
 	if((mb_data[0] & 1) == 1)
@@ -89,34 +100,40 @@ void init(long *mb_data)
 	}
 	else
 	{
-		// XXX: Panic here
+		puts("OH FUCK");
 	}
 
+
 	kernel_size = &_end - &_start;
-	set_color(1);
-	/*print_hex(phys_memory_size);
+	print_hex(phys_memory_size);
 	puts(" bytes of physical memory");
 	print_hex(kernel_size);
-	puts(" bytes used for kernel");*/
+	puts(" bytes used for kernel");
 
-	gdt_install();
-	set_color(2);
-	puts("Initialized GDT");
-
-	setup_idt();
 	set_color(3);
-	puts("Set up IDT");
-
-	pic_remap(32, 32+8);
-	set_color(4);
-	puts("Remapped PIC");
-
-	set_color(5);
 	init_palloc(phys_memory_size, kernel_size, mb_data);
-	set_color(6);
 	puts("Pagestack set up");
 
+	set_color(4);
+	setup_idt();
+	puts("Set up IDT");
+
+	set_color(5);
+	init_paging();
+	puts("Paging");
+
+	gdt_install();
+	screen_set_base((void*)0xB8000);
+	puts("Initialized GDT");
+
+
+	pic_remap(32, 32+8);
+	set_color(6);
+	puts("Remapped PIC");
+	sti();
+
 	set_color(7);
+
 }
 
 /* Kernel main */

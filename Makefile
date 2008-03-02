@@ -7,13 +7,13 @@ LD = ld
 ASM = nasm
 
 # Flags
-CFLAGS = -Wall -Werror -fno-builtin -nostdlib -nostartfiles -nodefaultlibs
+CFLAGS = -O -Wall -Werror -fno-builtin -nostdlib -nostartfiles -nodefaultlibs
 ASMFLAGS = -f elf
 LDFLAGS = 
 
 # Object list for kernel
 ASM_OBJS = loader.o interrupt.o
-C_OBJS = main.o init.o screen.o pic.o mem.o
+C_OBJS = main.o init.o screen.o pic.o mem.o paging.o
 OBJS = $(ASM_OBJS) $(C_OBJS)
 
 # Other misc. vars

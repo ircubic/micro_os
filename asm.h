@@ -43,4 +43,15 @@ static inline void hlt()
 {
 	asm("hlt");
 }
+
+static inline void cli()
+{
+	asm("cli");
+}
+
+static inline void sti()
+{
+	asm("sti");
+}
+
 #endif

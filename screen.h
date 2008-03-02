@@ -1,5 +1,6 @@
 #ifndef KERN_SCREEN_H
 #define KERN_SCREEN_H 1
+void screen_set_base(void *address);
 void inline set_cursor(int x, int y);
 void cls();
 void inline putch(char chr);

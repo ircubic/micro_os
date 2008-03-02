@@ -15,12 +15,35 @@ align 4
 ;  3: Handler function
 %macro intr_handler 3
 _intr_%1:
+; This is for interrupts with error codes
+%if (%1 == 8) || (%1 >= 10 && %1 <= 14) || (%1 == 17)
+	; Errorcode in eax, eax to esp
+	xchg eax, [esp]
+	; Emulate pusha
+	push ebx
+	push ecx
+	push edx
+	push ebp
+	push esi
+	push edi
+%else
 	pusha
-	push %2
+%endif
+	push DWORD %2
 	call %3
-	pop eax
+	add esp, 4
+%if (%1 == 8) || (%1 >= 10 && %1 <= 14) || (%1 == 17)
+	;pop edi
+	;pop esi
+	;pop edx
+	;pop ecx
+	;pop ebx
+	;pop eax
+%else
 	popa 
+%endif
 	iret
+
 %endmacro
 
 ; Create 32 Exception handlers, with numeric offset 0
@@ -64,8 +87,10 @@ setup_idt:
 %endrep
 
 	mov WORD [idtr], idt_end - idt - 1
-	mov DWORD [idtr+2], idt
-	lidt [idtr]
+	; The addition is because when the IDT is setup, we're still using the trick GDT,
+	; and the IDTR needs to contain the physical address
+	mov DWORD [idtr+2], idt + 0x40000000 
+	lidt [idtr] 
 	sti
 	ret
 
