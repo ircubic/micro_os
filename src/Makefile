@@ -22,10 +22,10 @@ OUTPUT = kernel.bin
 TARGET_DIR = ../bin
 IMAGE = $(TARGET_DIR)/a.img
 
-default: $(OUTPUT) image
-
-image: $(IMAGE)
+default: $(OUTPUT) 
 	cp kernel.bin $(TARGET_DIR)
+
+image:
 	mcopy -o -i $(IMAGE) kernel.bin ::/
 
 
