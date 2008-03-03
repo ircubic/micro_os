@@ -19,8 +19,15 @@ OBJS = $(ASM_OBJS) $(C_OBJS)
 # Other misc. vars
 LNKSCR = linker.ld
 OUTPUT = kernel.bin
+TARGET_DIR = ../bin
+IMAGE = $(TARGET_DIR)/a.img
 
-default: $(OUTPUT)
+default: $(OUTPUT) image
+
+image: $(IMAGE)
+	cp kernel.bin $(TARGET_DIR)
+	mcopy -o -i $(IMAGE) kernel.bin ::/
+
 
 # Links the kernel binary
 $(OUTPUT): $(LNKSCR) $(ASM_OBJS) $(C_OBJS)
