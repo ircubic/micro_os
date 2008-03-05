@@ -22,10 +22,13 @@ OUTPUT = kernel.bin
 TARGET_DIR = ../bin
 IMAGE = $(TARGET_DIR)/a.img
 
-default: $(OUTPUT) 
+default: $(OUTPUT) make_tags
 	cp kernel.bin $(TARGET_DIR)
 
-image:
+make_tags: 
+	ctags -R .
+
+image: default
 	mcopy -o -i $(IMAGE) kernel.bin ::/
 
 
@@ -42,4 +45,4 @@ $(OUTPUT): $(LNKSCR) $(ASM_OBJS) $(C_OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJS) $(OUTPUT)
+	rm -f $(OBJS) $(OUTPUT) $(TARGET_DIR)/kernel.bin tags

@@ -33,12 +33,12 @@ _intr_%1:
 	call %3
 	add esp, 4
 %if (%1 == 8) || (%1 >= 10 && %1 <= 14) || (%1 == 17)
-	;pop edi
-	;pop esi
-	;pop edx
-	;pop ecx
-	;pop ebx
-	;pop eax
+	pop edi
+	pop esi
+	pop edx
+	pop ecx
+	pop ebx
+	pop eax
 %else
 	popa 
 %endif
